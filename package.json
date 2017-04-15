@@ -1,0 +1,20 @@
+{
+  "name": "node-cqrs",
+  "version": "0.0.1",
+  "description": "node CQRS eventsourcing rabbitmq mongodb",
+  "main": "index.js",
+  "author": "daggerok",
+  "license": "MIT",
+  "devDependencies": {
+    "body-parser": "1.17.1",
+    "express": "4.15.2",
+    "mongodb": "2.2.25",
+    "mongoose": "4.9.4",
+    "morgan": "1.8.1",
+    "nconf": "0.8.4",
+    "servicebus": "2.0.10",
+    "servicebus-register-handlers": "0.1.7",
+    "servicebus-retry": "0.0.11",
+    "servicebus-trace": "0.0.1"
+  }
+}
