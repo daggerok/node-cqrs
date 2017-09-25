@@ -1,22 +1,37 @@
 group: edge
 dist: trusty
+
 language: node_js
 node_js:
   - 6
   - 7
+  - 8
+
 install: true
 before_install:
+  - sudo apt update
+
+  # install docker-compose
+  - sudo apt install -y python-pip curl jq libxml2-utils
+  - sudo pip install docker-compose httpie
+  - sudo usermod -aG docker $(whoami)
+
+  # kill whatever punning on postgres / rabbitmq port
+  - sudo kill $(sudo lsof -t -i:5432) | true
+  - sudo kill $(sudo lsof -t -i:5672) | true
+  - sudo kill $(sudo lsof -t -i:27017) | true
+
+  # yarn
   - npm i -g yarn
-#  - export CHROME_BIN=/usr/bin/google-chrome
-#  - export DISPLAY=:99.0
-#  - sh -e /etc/init.d/xvfb start
-#  - sudo apt-get update
-#  - sudo apt-get install -y libappindicator1 fonts-liberation
-#  - wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-#  - sudo dpkg -i google-chrome*.deb
+
 script:
-  - yarn install
+  - yarn -i
+  - docker-compose -f docker/docker-compose.yml up -d --build
+  - sleep 1
+  - docker-compose -f docker/docker-compose.yml down -v
+
 after_install: cat *.log | true
+
 cache:
   directories:
     - node_modules/

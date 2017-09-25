@@ -1,4 +1,4 @@
-# node-cqrs [![build](https://travis-ci.org/daggerok/node-cqrs.svg?branch=master)](https://travis-ci.org/daggerok/node-cqrs)
+= node-cqrs image:https://travis-ci.org/daggerok/node-cqrs.svg?branch=master["Build Status", link="https://travis-ci.org/daggerok/node-cqrs"]
 
 TODO: implement this...
 
@@ -14,6 +14,7 @@ TODO: implement this...
             [get data from mongodb (replica node)]
 
 ```bash
+docker-compose -f docker/docker-compose.yml up
 npm i
 ```
 
