@@ -2,28 +2,33 @@
 
 TODO: implement this...
 
-    (ui update data) >>
-        [produce command] >>
-            [handle rabbit event] >>
-                [save data into eventstore mongodb (master node)]
-    ...
-    eventual consistency
-    ...
-    (ui fetch data) >> | pooling | websockets | backpreassure
-        [query view / projection] >>
-            [get data from mongodb (replica node)]
+----
+(ui update data) >>
+    [produce command] >>
+        [handle rabbit event] >>
+            [save data into eventstore mongodb (master node)]
+...
+eventual consistency
+...
+(ui fetch data) >> | pooling | websockets | backpreassure
+    [query view / projection] >>
+        [get data from mongodb (replica node)]
+----
 
-```bash
-docker-compose -f docker/docker-compose.yml up
-npm i
-```
+[sources,bash]
+----
+yarn -i
+docker-compose -f docker/docker-compose.yml up -d --build
+docker-compose -f docker/docker-compose.yml down -v
+----
 
 links:
-- [express](http://expressjs.com/en/4x/api.html)
-- [mongodb-express](https://www.terlici.com/2015/04/03/mongodb-node-express.html)
-- [rabbitmq](https://www.rabbitmq.com/)
-- [servicebus](https://www.npmjs.com/package/servicebus)
-- [servicebus-retry](https://github.com/mateodelnorte/servicebus-retry)
-- [servicebus-register-handlers](https://github.com/mateodelnorte/servicebus-register-handlers)
-- [servicebus-trace](https://github.com/mateodelnorte/servicebus-trace)
-- [how to cqrs in node talk](http://nycnode.com/videos/matt-walters-how-to-cqrs-in-node-eventually-consistent-unidirectional-systems-with-microservices)
+
+. link:http://expressjs.com/en/4x/api.html[express]
+. link:https://www.terlici.com/2015/04/03/mongodb-node-express.html[mongodb-express]
+. link:https://www.rabbitmq.com/[rabbitmq]
+. link:https://www.npmjs.com/package/servicebus[servicebus]
+. link:https://github.com/mateodelnorte/servicebus-retry[servicebus-retry]
+. link:https://github.com/mateodelnorte/servicebus-register-handlers[servicebus-register-handlers]
+. link:https://github.com/mateodelnorte/servicebus-trace[servicebus-trace]
+. link:http://nycnode.com/videos/matt-walters-how-to-cqrs-in-node-eventually-consistent-unidirectional-systems-with-microservices[how to cqrs in node talk]
