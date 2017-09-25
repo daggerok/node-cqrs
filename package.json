@@ -25,9 +25,9 @@
     "npm-run-all": "4.1.1"
   },
   "scripts": {
-    "up": "docker-compose -f docker/docker-compose.yml up -d --build",
+    "composeUp": "docker-compose -f docker/docker-compose.yml up -d --build",
     "start": "npm-run-all -p start:*",
     "start:messanger": "cross-env MESSANGER_PORT=3000 nodemon ./messanger -w . -i node_modules",
-    "down": "docker-compose -f docker/docker-compose.yml down -v"
+    "composeDown": "docker-compose -f docker/docker-compose.yml down -v"
   }
 }

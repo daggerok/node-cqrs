@@ -18,8 +18,9 @@ eventual consistency
 [sources,bash]
 ----
 yarn -i
-docker-compose -f docker/docker-compose.yml up -d --build
-docker-compose -f docker/docker-compose.yml down -v
+docker-compose -f docker/docker-compose-all.yml up -d --build
+http :3000
+docker-compose -f docker/docker-compose-all.yml down -v
 ----
 
 [sources,bash]

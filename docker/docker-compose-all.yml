@@ -33,21 +33,23 @@ services:
       ME_CONFIG_BASICAUTH_PASSWORD: guest
     ports: ["8081:8081"]
     networks: [backing-services]
-  messanger:
+  message-command:
     restart: unless-stopped
     depends_on:
       rabbitmq:
         condition: service_healthy
-      mongo:
-        condition: service_healthy
-    build: ../
-    volumes: ["messanger-data:/data/db"]
+    build:
+      context: ../
+      dockerfile: ./docker/message-command/Dockerfile
+    environment:
+      RABBITMQ_HOST: rabbitmq
+    volumes: ["message-command-data:/data/db"]
     ports: ["3000:3000"]
     networks: [backing-services]
 volumes:
   rabbitmq-data: {}
   mongo-data: {}
-  messanger-data: {}
+  message-command-data: {}
 networks:
   backing-services:
     driver: bridge

@@ -26,9 +26,9 @@ before_install:
 
 script:
   - yarn -i
-  - docker-compose -f docker/docker-compose.yml up -d --build
-  - http :3000
-  - docker-compose -f docker/docker-compose.yml down -v
+  - docker-compose -f docker/docker-compose-all.yml up -d --build
+  - http post :3000/api/v1/message ololo=trololo
+  - docker-compose -f docker/docker-compose-all.yml down -v
 
 after_install: cat *.log | true
 
