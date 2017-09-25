@@ -22,6 +22,12 @@ docker-compose -f docker/docker-compose.yml up -d --build
 docker-compose -f docker/docker-compose.yml down -v
 ----
 
+[sources,bash]
+----
+yarn global add npm-check-updates
+ncu -u
+----
+
 links:
 
 . link:http://expressjs.com/en/4x/api.html[express]

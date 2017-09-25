@@ -22,7 +22,7 @@ before_install:
   - sudo kill $(sudo lsof -t -i:27017) | true
 
   # yarn
-  - npm i -g yarn
+  - npm i -g yarn npm-check-updates node-gyp
 
 script:
   - yarn -i
