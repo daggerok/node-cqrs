@@ -25,3 +25,4 @@ links:
 - [servicebus-retry](https://github.com/mateodelnorte/servicebus-retry)
 - [servicebus-register-handlers](https://github.com/mateodelnorte/servicebus-register-handlers)
 - [servicebus-trace](https://github.com/mateodelnorte/servicebus-trace)
+- [how to cqrs in node talk](http://nycnode.com/videos/matt-walters-how-to-cqrs-in-node-eventually-consistent-unidirectional-systems-with-microservices)
