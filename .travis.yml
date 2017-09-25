@@ -27,7 +27,7 @@ before_install:
 script:
   - yarn -i
   - docker-compose -f docker/docker-compose.yml up -d --build
-  - sleep 1
+  - http :3000
   - docker-compose -f docker/docker-compose.yml down -v
 
 after_install: cat *.log | true

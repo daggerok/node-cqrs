@@ -2,10 +2,10 @@
   "name": "node-cqrs",
   "version": "0.0.1",
   "description": "node CQRS eventsourcing rabbitmq mongodb",
-  "main": "index.js",
+  "main": "./messanger/index.js",
   "author": "daggerok",
   "license": "MIT",
-  "devDependencies": {
+  "dependencies": {
     "body-parser": "1.18.2",
     "express": "4.15.5",
     "mongodb": "2.2.31",
@@ -16,5 +16,18 @@
     "servicebus-register-handlers": "0.1.7",
     "servicebus-retry": "0.0.11",
     "servicebus-trace": "0.0.1"
+  },
+  "devDependencies": {
+    "@types/express": "4.0.37",
+    "@types/node": "8.0.31",
+    "cross-env": "5.0.5",
+    "nodemon": "1.12.1",
+    "npm-run-all": "4.1.1"
+  },
+  "scripts": {
+    "up": "docker-compose -f docker/docker-compose.yml up -d --build",
+    "start": "npm-run-all -p start:*",
+    "start:messanger": "cross-env MESSANGER_PORT=3000 nodemon ./messanger -w . -i node_modules",
+    "down": "docker-compose -f docker/docker-compose.yml down -v"
   }
 }
