@@ -13,7 +13,7 @@ http post :3000/api/v1/messages and=3
 http post :3000/api/v1/messages and=4
 
 # verify if messages where received via rabbitmq broker
-docker logs docker_message-command_1
+docker service logs node-cqrs_message-command
 
 # shutdown
 bash bin/swarm-down.bash

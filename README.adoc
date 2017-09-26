@@ -1,5 +1,7 @@
 = node-cqrs image:https://travis-ci.org/daggerok/node-cqrs.svg?branch=master["Build Status", link="https://travis-ci.org/daggerok/node-cqrs"]
 
+This repository contains CQRS application using node/express, servicebus-* + rabbitmq mongo and docker (swarm cluster included)
+
 _TODO: not yet finished..._
 
 ----
@@ -27,21 +29,21 @@ done:
 http post :3000/api/v1/messages payload='some data as messages.create type event'
 ----
 
-.automation tests using docker swarm / docker stack deploy (required docker / swarm / compose and httpie installed)
+.automation e2e tests using docker swarm / docker stack deploy (required docker / swarm / compose and httpie installed)
 [sources,bash]
 ----
 yarn -i
-bash docker/test-docker-compose.bash
+bash e2e-tests/docker-swarm.bash
 ----
 
-.automation tests using docker-compose (required docker compose and httpie installed)
+.automation e2e tests using docker-compose (required docker compose and httpie installed)
 [sources,bash]
 ----
 yarn -i
-bash docker/test-docker-compose.bash
+bash e2e-tests/docker-compose.bash
 ----
 
-.manual testing using docker-compose (required docker compose and httpie installed)
+.manual e2e testing using docker-compose (required docker compose and httpie installed)
 [sources,bash]
 ----
 yarn -i

@@ -48,4 +48,4 @@ docker service logs node-cqrs_message-command
 docker swarm leave --force
 
 ## full (about ~1.02GB) cleanup
-# docker system prune --all
+#bash bin/cleanup.bash

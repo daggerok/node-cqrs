@@ -17,6 +17,3 @@ docker logs docker_message-command_1
 
 # shutdown
 bash bin/compose-down.bash
-
-## and clean up afterward
-#bash bin/cleanup.bash

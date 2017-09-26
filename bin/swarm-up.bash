@@ -27,10 +27,20 @@ docker stack deploy --compose-file docker/docker-compose-stack.yml node-cqrs
 # ls node-cqrs stack services
 docker stack services node-cqrs
 
-# stacke up message-command application
-docker service scale --detach=false node-cqrs_message-command=3
+## `service scale --detach=false` available only from docker 17.07.0-ce
+
+# scale down useless mongo-express for now
+docker service scale --detach=false node-cqrs_mongo-express=0
 docker stack services node-cqrs
 
-# scale down useless mongo-epress for now
-docker service scale --detach=false node-cqrs_mongo-express=0
+# scale down useless mongo for now
+docker service scale --detach=false node-cqrs_mongo=0
+docker stack services node-cqrs
+
+# scale no rabbitmq as is: 1
+docker service scale --detach=false node-cqrs_rabbitmq=1
+docker stack services node-cqrs
+
+# scale up message-command application up to 3
+docker service scale --detach=false node-cqrs_message-command=3
 docker stack services node-cqrs
