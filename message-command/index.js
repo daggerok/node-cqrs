@@ -5,15 +5,10 @@ const uuid = require('uuid');
 
 const app = express();
 
-const {
-  RABBITMQ_HOST,
-  RABBITMQ_PORT,
-  RABBITMQ_URL,
-  MESSAGE_COMMAND_PORT,
-  PORT,
-} = process.env;
+morgan.token('service', () => 'command');
 
-if (app.get('env') === 'development') app.use(morgan('dev'));
+if (app.get('env') === 'development')
+  app.use(morgan(':service :remote-addr :method :url :status :response-time ms'));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -26,6 +21,22 @@ app.use((req, res, next) => {
   next();
 });
 
+/**
+ * env
+ */
+
+const {
+  RABBITMQ_HOST,
+  RABBITMQ_PORT,
+  RABBITMQ_URL,
+  MESSAGE_COMMAND_PORT,
+  PORT,
+} = process.env;
+
+/**
+ * rabbitmq
+ */
+
 const events = {
   create: 'messages.create',
 };
@@ -34,10 +45,6 @@ const rabbitHost = RABBITMQ_HOST || '127.0.0.1';
 const rabbitPort = RABBITMQ_PORT || '5672';
 const rabbitUrl =  RABBITMQ_URL || `amqp://${rabbitHost}:${rabbitPort}`;
 const bus = require('servicebus').bus({ url: rabbitUrl });
-
-bus.listen(events.create, e => {
-  console.log('message created', e);
-});
 
 const router = express.Router();
 
@@ -54,5 +61,6 @@ app.use((req, res) => res.json({ health: 'OK' }));
 
 const port = MESSAGE_COMMAND_PORT || PORT || 3001;
 
-app.listen(port, () =>
-  console.log(`message-command service is listening ${port} port.`));
+app.listen(port, () => console.log(`
+  message-command service is listening ${port} port.
+`));

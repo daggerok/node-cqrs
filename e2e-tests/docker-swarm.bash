@@ -14,6 +14,7 @@ http post :3001/api/v1/messages and=4
 
 # verify if messages where received via rabbitmq broker
 docker service logs node-cqrs_message-command
+docker service logs node-cqrs_message-store
 
 # message-frontend
 http post :3000

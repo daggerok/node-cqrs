@@ -18,6 +18,9 @@ docker build -f docker/message-command/Dockerfile -t 127.0.0.1:5000/message-comm
 # build message-frontend application image
 docker build -f docker/message-frontend/Dockerfile -t 127.0.0.1:5000/message-frontend .
 
+# build message-store application image
+docker build -f docker/message-store/Dockerfile -t 127.0.0.1:5000/message-store .
+
 # pull other images
 docker-compose -f docker/docker-stack-deploy.yml build --force-rm --no-cache --pull
 
@@ -32,22 +35,23 @@ docker stack services node-cqrs
 
 ## `service scale --detach=false` available only from docker 17.07.0-ce
 
-## scale down useless mongo-express for now
-#docker service scale --detach=false node-cqrs_mongo-express=0
-#docker stack services node-cqrs
-#
-## scale down useless mongo for now
-#docker service scale --detach=false node-cqrs_mongo=0
-#docker stack services node-cqrs
+# scale no mongo service as is: 1
+docker service scale --detach=false node-cqrs_mongo=1
 
-# scale no rabbitmq as is: 1
+# scale no rabbitmq service as is: 1
 docker service scale --detach=false node-cqrs_rabbitmq=1
-docker stack services node-cqrs
 
-# scale up message-command application up to 3
+# scale down useless mongo-express
+docker service scale node-cqrs_mongo-express=1
+
+# scale no message-store service app as is: 1
+docker service scale --detach=false node-cqrs_message-store=1
+
+# scale up message-command service app up to 2
 docker service scale --detach=false node-cqrs_message-command=2
-docker stack services node-cqrs
 
-# scale up message-command application up to 3
-docker service scale --detach=false node-cqrs_message-frontend=5
+# scale up message-frontend service app up to 3
+docker service scale --detach=false node-cqrs_message-frontend=3
+
+# show all node-cqrs stack services
 docker stack services node-cqrs

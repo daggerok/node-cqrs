@@ -14,13 +14,13 @@ docker-compose -f docker/docker-stack-deploy.yml push
 docker stack deploy --compose-file docker/docker-stack-deploy.yml node-cqrs
 docker stack services node-cqrs
 
-#docker service scale node-cqrs_mongo-express=0
-#docker stack services node-cqrs
-#docker service scale --detach=false node-cqrs_mongo=0
-#docker stack services node-cqrs
-
+docker service scale node-cqrs_mongo-express=1
+docker service scale --detach=false node-cqrs_mongo=1
+docker service scale --detach=false node-cqrs_rabbitmq=1
+docker service scale --detach=false node-cqrs_message-store=2
 docker service scale --detach=false node-cqrs_message-command=2
 docker stack services node-cqrs
+
 http post :3001/api/v1/messages and=one
 http post :3001/api/v1/messages and=two
 http post :3001/api/v1/messages and=three

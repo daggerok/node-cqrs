@@ -1,5 +1,21 @@
 version: "3.3"
 services:
+  mongo:
+    restart: unless-stopped
+    image: healthcheck/mongo:latest
+    environment:
+      MONGO_PORT_27017_TCP_PORT: 27017
+    ports: ["27017:27017"]
+    volumes: ["mongo-data:/data/db"]
+  mongo-express:
+    restart: unless-stopped
+    depends_on: [mongo]
+    image: mongo-express:0.42.2
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongo
+      ME_CONFIG_BASICAUTH_USERNAME: guest
+      ME_CONFIG_BASICAUTH_PASSWORD: guest
+    ports: ["8081:8081"]
   rabbitmq:
     image: 127.0.0.1:5000/rabbitmq-healthcheck
     restart: unless-stopped
@@ -12,23 +28,21 @@ services:
       - "15672:15672"
       - "25672:25672"
     volumes: ["rabbitmq-data:/var/lib/rabbitmq"]
-#  mongo:
-#    restart: unless-stopped
-#    image: healthcheck/mongo:latest
-#    environment:
-#      MONGO_PORT_27017_TCP_PORT: 27017
-#      JAVA_OPTS: ""
-#    ports: ["27017:27017"]
-#    volumes: ["mongo-data:/data/db"]
-#  mongo-express:
-#    restart: unless-stopped
-#    depends_on: [mongo]
-#    image: mongo-express:0.42.2
-#    environment:
-#      ME_CONFIG_MONGODB_SERVER: mongo
-#      ME_CONFIG_BASICAUTH_USERNAME: guest
-#      ME_CONFIG_BASICAUTH_PASSWORD: guest
-#    ports: ["8081:8081"]
+  message-store:
+    image: 127.0.0.1:5000/message-store
+    restart: unless-stopped
+    depends_on:
+      - mongo
+      - rabbitmq
+    build:
+      context: ../
+      dockerfile: ./docker/message-store/Dockerfile
+    environment:
+      MONGODB_HOST: mongo
+      RABBITMQ_HOST: rabbitmq
+      MESSAGE_STORE_PORT: 3002
+    volumes: ["message-store-data:/home/node/app"]
+    ports: ["3002:3002"]
   message-command:
     image: 127.0.0.1:5000/message-command
     restart: unless-stopped
@@ -54,7 +68,8 @@ services:
     volumes: ["message-frontend-data:/home/node/app"]
     ports: ["3000:3000"]
 volumes:
+  mongo-data: {}
   rabbitmq-data: {}
-#  mongo-data: {}
+  message-store-data: {}
   message-command-data: {}
   message-frontend-data: {}

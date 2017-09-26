@@ -31,7 +31,7 @@
       headers: {
         'content-type': 'application/json',
       },
-      body: JSON.stringify({ message })
+      body: JSON.stringify({ content: message })
     });
   };
 

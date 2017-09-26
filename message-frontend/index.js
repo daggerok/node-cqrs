@@ -4,17 +4,10 @@ const morgan = require('morgan');
 
 const app = express();
 
-const {
-  NODE_ENV,
-  MESSAGE_COMMAND_HOST,
-  MESSAGE_COMMAND_PORT,
-  MESSAGE_FRONTEND_PORT,
-  PORT,
-} = process.env;
+morgan.token('service', () => 'frontend');
 
-const inDevMode = () => app.get('env') === 'development';
-
-if (inDevMode()) app.use(morgan('dev'));
+if (app.get('env') === 'development')
+  app.use(morgan(':service :remote-addr :method :url :status :response-time ms'));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -26,7 +19,18 @@ const frontendPath = rel => path.join(__dirname, '/', rel);
 
 app.use(express.static(frontendPath('./static')));
 
-const router = express.Router();
+/**
+ * env
+ */
+
+const {
+  NODE_ENV,
+  MESSAGE_COMMAND_HOST,
+  MESSAGE_COMMAND_PORT,
+  MESSAGE_FRONTEND_PORT,
+  PORT,
+} = process.env;
+
 const messageCommandHost = MESSAGE_COMMAND_HOST || '127.0.0.1';
 const messageCommandPort = MESSAGE_COMMAND_PORT || '3001';
 
@@ -39,7 +43,7 @@ const config = {
   env: app.get('env'),
 };
 
-console.log(config);
+const router = express.Router();
 
 router.get('/config', (req, res) => {
   res.json({
