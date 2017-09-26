@@ -25,12 +25,11 @@ before_install:
   - npm i -g yarn npm-check-updates node-gyp
 
 script:
+
   - yarn -i
-  - docker-compose -f docker/docker-compose-all.yml up -d --build
-  - http post :3000/api/v1/message ololo=trololo
-  - sleep 1
-  - docker logs docker_message-command_1
-  - docker-compose -f docker/docker-compose-all.yml down -v
+
+  - bash e2e-tests/docker-compose.bash
+  - bash e2e-tests/docker-swarm.bash
 
 after_install: cat *.log | true
 

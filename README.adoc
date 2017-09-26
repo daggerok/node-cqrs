@@ -1,6 +1,6 @@
 = node-cqrs image:https://travis-ci.org/daggerok/node-cqrs.svg?branch=master["Build Status", link="https://travis-ci.org/daggerok/node-cqrs"]
 
-TODO: implement this...
+_TODO: not yet finished..._
 
 ----
 (ui update data) >>
@@ -15,6 +15,33 @@ eventual consistency
         [get data from mongodb (replica node)]
 ----
 
+done:
+
+. implemented docker infrastructure: rabbitmq, mongo
+. message-command app
+
+
+.send message via REST API to RabbitMQ message broker
+[sources,bash]
+----
+http post :3000/api/v1/messages payload='some data as messages.create type event'
+----
+
+.automation tests using docker swarm / docker stack deploy (required docker / swarm / compose and httpie installed)
+[sources,bash]
+----
+yarn -i
+bash docker/test-docker-compose.bash
+----
+
+.automation tests using docker-compose (required docker compose and httpie installed)
+[sources,bash]
+----
+yarn -i
+bash docker/test-docker-compose.bash
+----
+
+.manual testing using docker-compose (required docker compose and httpie installed)
 [sources,bash]
 ----
 yarn -i
@@ -23,6 +50,7 @@ http :3000
 docker-compose -f docker/docker-compose-all.yml down -v
 ----
 
+.update npm
 [sources,bash]
 ----
 yarn global add npm-check-updates

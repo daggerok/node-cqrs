@@ -34,7 +34,7 @@ bus.listen(events.types.messages.create, e => {
   console.log('message created', e);
 });
 
-app.post('/api/v1/message', (req, res) => {
+app.post('/api/v1/messages', (req, res) => {
   const message = req.body;
   const payload = {
     id: Date.now(),
