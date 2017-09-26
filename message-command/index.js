@@ -1,54 +1,58 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+const morgan = require('morgan');
+const uuid = require('uuid');
+
 const app = express();
 
-const path = require('path');
-const pathTo = rel => path.join(__dirname, '/', rel);
+const {
+  RABBITMQ_HOST,
+  RABBITMQ_PORT,
+  RABBITMQ_URL,
+  MESSAGE_COMMAND_PORT,
+  PORT,
+} = process.env;
 
-const bodyParser = require('body-parser');
+if (app.get('env') === 'development') app.use(morgan('dev'));
+
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-  extended: true,
-}));
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get('/', (req, res) => {
-  //res.send('Hello!');
-  res.json({
-    message: 'Hi there!'
-  });
+app.use((req, res, next) => {
+  res.header("Access-Control-Max-Age", "3600");
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  next();
 });
 
 const events = {
-  types: {
-    messages: {
-      create: 'messages.create',
-    },
-  },
+  create: 'messages.create',
 };
 
-const busHost = process.env.RABBITMQ_HOST || '127.0.0.1';
-const busPort = process.env.RABBITMQ_PORT || '5672';
-const url =  process.env.RABBITMQ_URL || `amqp://${busHost}:${busPort}`;
-const bus = require('servicebus').bus({ url });
+const rabbitHost = RABBITMQ_HOST || '127.0.0.1';
+const rabbitPort = RABBITMQ_PORT || '5672';
+const rabbitUrl =  RABBITMQ_URL || `amqp://${rabbitHost}:${rabbitPort}`;
+const bus = require('servicebus').bus({ url: rabbitUrl });
 
-bus.listen(events.types.messages.create, e => {
+bus.listen(events.create, e => {
   console.log('message created', e);
 });
 
-app.post('/api/v1/messages', (req, res) => {
+const router = express.Router();
+
+router.post('/api/v1/messages', (req, res) => {
+  const id = uuid.v4();
   const message = req.body;
-  const payload = {
-    id: Date.now(),
-    message,
-  };
-  bus.send(events.types.messages.create, {
-    payload,
-  });
-  res.json({
-    message: 'message sent',
-  });
+  bus.send(events.create, { id, message });
+  res.json({ id });
 });
 
-const port = process.env.MESSANGER_PORT || process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`server is running on http://localhost:${port}/`);
-});
+app.use(router);
+
+app.use((req, res) => res.json({ health: 'OK' }));
+
+const port = MESSAGE_COMMAND_PORT || PORT || 3001;
+
+app.listen(port, () =>
+  console.log(`message-command service is listening ${port} port.`));

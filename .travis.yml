@@ -11,14 +11,14 @@ install: true
 before_install:
 
   # install docker 17.07.0~ce-0~ubuntu read https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/#install-using-the-repository
-  - sudo apt-get remove docker docker-engine docker.io
+  - sudo apt remove docker docker-engine docker.io
   - sudo apt update
   - >
-    sudo apt-get install -y \
+    sudo apt install -y \
         linux-image-extra-$(uname -r) \
         linux-image-extra-virtual
   - >
-    sudo apt-get install -y \
+    sudo apt install -y \
         apt-transport-https \
         ca-certificates \
         curl \
@@ -32,10 +32,10 @@ before_install:
        $(lsb_release -cs) \
        stable"
 
-  - sudo apt-get update -y
-  - sudo apt-get install -y docker-ce
+  - sudo apt update -y
+  - sudo apt install -y docker-ce
   - sudo apt-cache madison docker-ce
-  - sudo apt-get install -y docker-ce=17.07.0~ce-0~ubuntu
+  - sudo apt install -y docker-ce=17.07.0~ce-0~ubuntu
 
   # install docker-compose
   - sudo apt install -y python-pip curl jq libxml2-utils
@@ -53,7 +53,6 @@ before_install:
 script:
 
   - yarn -i
-
   - bash e2e-tests/docker-compose.bash
   - bash e2e-tests/docker-swarm.bash
 

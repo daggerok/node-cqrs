@@ -7,13 +7,18 @@ set -x
 bash bin/swarm-up.bash
 
 # test message-command REST API
-http post :3000/api/v1/messages and=1
-http post :3000/api/v1/messages and=2
-http post :3000/api/v1/messages and=3
-http post :3000/api/v1/messages and=4
+http post :3001/api/v1/messages and=1
+http post :3001/api/v1/messages and=2
+http post :3001/api/v1/messages and=3
+http post :3001/api/v1/messages and=4
 
 # verify if messages where received via rabbitmq broker
 docker service logs node-cqrs_message-command
+
+# message-frontend
+http post :3000
+http post :3000
+docker service logs node-cqrs_message-fronted
 
 # shutdown
 bash bin/swarm-down.bash

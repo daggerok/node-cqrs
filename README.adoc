@@ -26,7 +26,7 @@ done:
 .send message via REST API to RabbitMQ message broker
 [sources,bash]
 ----
-http post :3000/api/v1/messages payload='some data as messages.create type event'
+http post :3001/api/v1/messages payload='some data as messages.create type event'
 ----
 
 .automation e2e tests using docker swarm / docker stack deploy (required docker / swarm / compose and httpie installed)
@@ -48,7 +48,7 @@ bash e2e-tests/docker-compose.bash
 ----
 yarn -i
 docker-compose -f docker/docker-compose-all.yml up -d --build
-http :3000
+http :3001
 docker-compose -f docker/docker-compose-all.yml down -v
 ----
 

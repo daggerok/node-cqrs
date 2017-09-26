@@ -1,51 +1,37 @@
 #!/usr/bin/env bash
-
-# enable debug output
 set -x
 
-# init docker swarm cluster
 docker swarm init
-
-# create local registry
 docker service create --detach=false --name registry --publish 5000:5000 registry:2
 
-# build custom rabbitmq image
 docker build -f docker/rabbitmq-healthcheck/Dockerfile -t 127.0.0.1:5000/rabbitmq-healthcheck .
-
-# build message-command application image
 docker build -f docker/message-command/Dockerfile -t 127.0.0.1:5000/message-command .
+docker build -f docker/message-frontend/Dockerfile -t 127.0.0.1:5000/message-frontend .
 
-# pull other images
-docker-compose -f docker/docker-compose-stack.yml build --force-rm --no-cache --pull
+docker-compose -f docker/docker-stack-deploy.yml build --pull
+docker-compose -f docker/docker-stack-deploy.yml push
 
-# push whole needed stack to local registry
-docker-compose -f docker/docker-compose-stack.yml push
-
-# deploy stack as node-cqrs
-docker stack deploy --compose-file docker/docker-compose-stack.yml node-cqrs
-
-# ls node-cqrs stack services
+docker stack deploy --compose-file docker/docker-stack-deploy.yml node-cqrs
 docker stack services node-cqrs
 
-# stacke up message-command application
-docker service scale --detach=false node-cqrs_message-command=3
+#docker service scale node-cqrs_mongo-express=0
+#docker stack services node-cqrs
+#docker service scale --detach=false node-cqrs_mongo=0
+#docker stack services node-cqrs
+
+docker service scale --detach=false node-cqrs_message-command=2
 docker stack services node-cqrs
-
-# scale down useless mongo-epress for now
-docker service scale --detach=false node-cqrs_mongo-express=0
-docker stack services node-cqrs
-
-# test message-command REST API
-http post :3000/api/v1/messages and=one
-http post :3000/api/v1/messages and=two
-http post :3000/api/v1/messages and=three
-http post :3000/api/v1/messages and=four!
-
-# verify if messages where received via rabbitmq broker
+http post :3001/api/v1/messages and=one
+http post :3001/api/v1/messages and=two
+http post :3001/api/v1/messages and=three
+http post :3001/api/v1/messages and=four!
 docker service logs node-cqrs_message-command
 
-# clean up afterward
-docker swarm leave --force
+docker service scale --detach=false node-cqrs_message-frontend=3
+docker stack services node-cqrs
+http post :3000
+http post :3000
+docker service logs node-cqrs_message-frontend
 
-## full (about ~1.02GB) cleanup
+docker swarm leave --force
 #bash bin/cleanup.bash

@@ -1,6 +1,8 @@
 FROM node:8.5.0-alpine
 MAINTAINER Maksim Kostromin <daggerok@gmail.com>
-EXPOSE 3000
+RUN apk --no-cache add curl
+EXPOSE 3001
+HEALTHCHECK --interval=3s --timeout=3s --retries=5 CMD curl -f http://127.0.0.1:3001 || exit 1
 RUN mkdir -p /home/node/app/message-command
 WORKDIR /home/node/app
 ENTRYPOINT ["node", "./message-command"]
