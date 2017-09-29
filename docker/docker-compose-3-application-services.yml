@@ -1,0 +1,122 @@
+version: "3.3"
+
+services:
+
+  mongo-express:
+    image: mongo-express:0.42.2
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongo
+      ME_CONFIG_BASICAUTH_USERNAME: guest
+      ME_CONFIG_BASICAUTH_PASSWORD: guest
+    ports: ["8081:8081"]
+    networks:
+      - frontend
+      - backend
+    restart: unless-stopped
+    deploy:
+      mode: global
+      resources:
+        reservations:
+          cpus: "0.01"
+          memory: 50M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        window: 15s
+      placement:
+        constraints: [node.role == manager]
+
+  message-store:
+    image: 127.0.0.1:5000/message-store
+    build:
+      context: ..
+      dockerfile: ./docker/message-store/Dockerfile
+    ports: ["3002:3002"]
+    volumes: ["message-store-data:/home/node/app"]
+    networks: [backend]
+    environment:
+      MONGODB_HOST: mongo
+      RABBITMQ_HOST: rabbitmq
+      MESSAGE_STORE_PORT: 3002
+    restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: vip
+      update_config:
+        delay: 10s
+      resources:
+        reservations:
+          cpus: "0.01"
+          memory: 50M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        window: 15s
+
+  message-command:
+    image: 127.0.0.1:5000/message-command
+    build:
+      context: ..
+      dockerfile: ./docker/message-command/Dockerfile
+    ports: ["3001:3001"]
+    volumes: ["message-command-data:/home/node/app"]
+    networks: [backend]
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      MESSAGE_COMMAND_PORT: 3001
+    restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 2
+      update_config:
+        delay: 10s
+        parallelism: 2
+      endpoint_mode: vip
+      resources:
+        reservations:
+          cpus: "0.01"
+          memory: 50M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        window: 15s
+
+  message-frontend:
+    image: 127.0.0.1:5000/message-frontend
+    build:
+      context: ..
+      dockerfile: ./docker/message-frontend/Dockerfile
+    ports: ["3000:3000"]
+    volumes: ["message-frontend-data:/home/node/app"]
+    networks:
+      - frontend
+      - backend
+    environment:
+      MESSAGE_FRONTEND_PORT: 3000
+      MESSAGE_COMMAND_HOST: message-command
+    restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 3
+      update_config:
+        delay: 10s
+        parallelism: 2
+      endpoint_mode: vip
+      resources:
+        reservations:
+          cpus: "0.01"
+          memory: 50M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        window: 15s
+
+volumes:
+  message-store-data:
+  message-command-data:
+  message-frontend-data:
+
+networks:
+  frontend:
+  backend:

@@ -1,0 +1,66 @@
+version: "3.3"
+
+services:
+
+  mongo:
+    image: mongo:3.4.9-jessie
+    ports: ["27017:27017"]
+    volumes: ["mongo-data:/data/db"]
+    networks: [backend]
+    restart: unless-stopped
+    deploy:
+      mode: global
+      resources:
+        reservations:
+          cpus: "0.01"
+          memory: 50M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        window: 15s
+      placement:
+        constraints: [node.role == manager]
+
+  rabbitmq:
+    image: rabbitmq:3.6.12-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes: ["rabbitmq-data:/var/lib/rabbitmq"]
+    networks:
+      - backend
+      - frontend
+    restart: unless-stopped
+    deploy:
+      mode: global
+      resources:
+        reservations:
+          cpus: "0.01"
+          memory: 25M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        window: 15s
+      update_config:
+        delay: 10s
+
+  visualizer:
+    image: dockersamples/visualizer:stable
+    ports: ["8080:8080"]
+    stop_grace_period: 1m30s
+    volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          cpus: "0.01"
+      placement:
+        constraints: [node.role == manager]
+
+volumes:
+  mongo-data:
+  rabbitmq-data:
+
+networks:
+  frontend:
+  backend:

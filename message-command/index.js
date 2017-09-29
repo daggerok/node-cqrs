@@ -46,18 +46,16 @@ const rabbitPort = RABBITMQ_PORT || '5672';
 const rabbitUrl =  RABBITMQ_URL || `amqp://${rabbitHost}:${rabbitPort}`;
 const bus = require('servicebus').bus({ url: rabbitUrl });
 
-const router = express.Router();
-
-router.post('/api/v1/messages', (req, res) => {
+app.post('/api/v1/messages', (req, res) => {
   const id = uuid.v4();
   const message = req.body;
   bus.send(events.create, { id, message });
   res.json({ id });
 });
 
-app.use(router);
-
-app.use((req, res) => res.json({ health: 'OK' }));
+app.use('/**', (req, res) => {
+  res.json({ health: 'command OK' });
+});
 
 const port = MESSAGE_COMMAND_PORT || PORT || 3001;
 

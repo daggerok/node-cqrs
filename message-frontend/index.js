@@ -14,11 +14,6 @@ app.use(bodyParser.urlencoded({
   extended: true,
 }));
 
-const path = require('path');
-const frontendPath = rel => path.join(__dirname, '/', rel);
-
-app.use(express.static(frontendPath('./static')));
-
 /**
  * env
  */
@@ -43,17 +38,24 @@ const config = {
   env: app.get('env'),
 };
 
-const router = express.Router();
-
-router.get('/config', (req, res) => {
+app.get('/config', (req, res) => {
   res.json({
     config,
   });
 });
 
-app.use(router);
+app.get('/health', (req, res) => {
+  res.json({
+    health: 'frontend OK',
+  });
+});
 
-app.use((req, res) => res.redirect('/'));
+const path = require('path');
+const frontendPath = rel => path.join(__dirname, '/', rel);
+
+app.use(express.static(frontendPath('./static')));
+
+app.use('/**', (req, res) => res.redirect('/'));
 
 
 const port = MESSAGE_FRONTEND_PORT || PORT || 3000;

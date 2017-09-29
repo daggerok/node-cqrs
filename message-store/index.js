@@ -17,11 +17,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
  */
 
 const {
-  MONGODB_USER,
-  MONGODB_PASSWORD,
   MONGODB_HOST,
-  MONGODB_PORT,
-  MONGODB_NAME,
   MONGODB_URL,
   RABBITMQ_HOST,
   RABBITMQ_PORT,
@@ -34,26 +30,12 @@ const {
  * mongodb connection
  */
 
-let mongoUrl = 'mongodb://';
-
-if (MONGODB_USER && MONGODB_PASSWORD) mongoUrl += `${MONGODB_USER}:${MONGODB_PASSWORD}@`;
-
 const mongoHost = MONGODB_HOST || '127.0.0.1';
-const mongoPort = MONGODB_PORT || '27017';
-const mongoName = MONGODB_NAME || 'messages';
-
-mongoUrl += `${mongoHost}:${mongoPort}/${mongoName}`;
-
-const mongoDbUrl = MONGODB_URL || mongoUrl
+const mongoUrl = MONGODB_URL || `mongodb://${mongoHost}/messages`;
+const options = { useMongoClient: true };
 const mongoose = require('mongoose');
-const options = {
-  useMongoClient: true,
-  keepAlive: true,
-  reconnectTries: 30,
-  socketTimeoutMS: 0,
-};
 
-mongoose.connect(mongoDbUrl, options);
+mongoose.connect(mongoUrl, options);
 
 /**
  * rambbitmq connection
@@ -88,7 +70,8 @@ bus.listen(events.create, payload => {
   const message = new Message(Object.assign({}, payload));
   const promise = message.save();
   promise.then(document => {
-    console.info('store', document);
+    console.info('store: saved document');
+    console.info(document);
   });
 });
 
@@ -96,13 +79,13 @@ bus.listen(events.create, payload => {
  * default fallback / health endpoint
  */
 
-app.use((req, res) => res.json({ health: 'OK' }));
+app.use('/**', (req, res) => res.json({ health: 'store OK' }));
 
 /**
  * bootstrap
  */
 
-const port = MESSAGE_STORE_PORT || PORT || 3001;
+const port = MESSAGE_STORE_PORT || PORT || 3002;
 
 app.listen(port, () => console.log(`
   message-store service is listening ${port} port.

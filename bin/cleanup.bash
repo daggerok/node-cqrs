@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-# enable debug output
-set -x
-
-# full (about ~1.02GB) cleanup
-docker system prune --all
+docker-compose -f docker/docker-compose-application-services.yml down -v
+docker swarm leave --force
+docker system prune --all --force

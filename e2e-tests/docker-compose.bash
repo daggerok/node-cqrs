@@ -20,4 +20,4 @@ docker logs docker_message-command_1
 docker logs docker_message-store_1
 
 # shutdown
-bash bin/compose-down.bash
+bash bin/cleanup.bash

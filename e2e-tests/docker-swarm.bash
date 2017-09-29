@@ -13,16 +13,13 @@ http post :3001/api/v1/messages and=3
 http post :3001/api/v1/messages and=4
 
 # verify if messages where received via rabbitmq broker
-docker service logs node-cqrs_message-command
-docker service logs node-cqrs_message-store
+docker service logs app_message-command
+docker service logs app_message-store
 
 # message-frontend
 http post :3000
 http post :3000
-docker service logs node-cqrs_message-fronted
+docker service logs app_message-fronted
 
-# shutdown
-bash bin/swarm-down.bash
-
-## and clean up afterward
-#bash bin/cleanup.bash
+# shutdown and clean up afterward
+bash bin/cleanup.bash

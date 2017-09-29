@@ -35,7 +35,7 @@ before_install:
   - sudo apt update -y
   - sudo apt install -y docker-ce
   - sudo apt-cache madison docker-ce
-  - sudo apt install -y docker-ce=17.07.0~ce-0~ubuntu
+  #- sudo apt install -y docker-ce=17.07.0~ce-0~ubuntu
 
   # install docker-compose
   - sudo apt install -y python-pip curl jq libxml2-utils

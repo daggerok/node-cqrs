@@ -1,25 +1,35 @@
-version: "3.3"
+version: "2.1"
+
 services:
+
   mongo:
     restart: unless-stopped
     image: healthcheck/mongo:latest
     environment:
       MONGO_PORT_27017_TCP_PORT: 27017
+      JAVA_OPTS: ""
     ports: ["27017:27017"]
     volumes: ["mongo-data:/data/db"]
+    networks: [backing-services]
+
   mongo-express:
     restart: unless-stopped
-    depends_on: [mongo]
+    depends_on:
+      mongo:
+        condition: service_healthy
     image: mongo-express:0.42.2
     environment:
       ME_CONFIG_MONGODB_SERVER: mongo
       ME_CONFIG_BASICAUTH_USERNAME: guest
       ME_CONFIG_BASICAUTH_PASSWORD: guest
     ports: ["8081:8081"]
+    networks: [backing-services]
+
   rabbitmq:
-    image: 127.0.0.1:5000/rabbitmq-healthcheck
     restart: unless-stopped
-    build: ./rabbitmq-healthcheck
+    build:
+      context: ..
+      dockerfile: ./docker/rabbitmq-healthcheck/health/Dockerfile
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
@@ -28,48 +38,63 @@ services:
       - "15672:15672"
       - "25672:25672"
     volumes: ["rabbitmq-data:/var/lib/rabbitmq"]
+    networks: [backing-services]
+
   message-store:
-    image: 127.0.0.1:5000/message-store
     restart: unless-stopped
     depends_on:
-      - mongo
-      - rabbitmq
+      mongo:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     build:
-      context: ../
-      dockerfile: ./docker/message-store/Dockerfile
+      context: ..
+      dockerfile: ./docker/message-store/health/Dockerfile
     environment:
       MONGODB_HOST: mongo
       RABBITMQ_HOST: rabbitmq
       MESSAGE_STORE_PORT: 3002
     volumes: ["message-store-data:/home/node/app"]
     ports: ["3002:3002"]
+    networks: [backing-services]
+
   message-command:
-    image: 127.0.0.1:5000/message-command
     restart: unless-stopped
-    depends_on: [rabbitmq]
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
     build:
-      context: ../
-      dockerfile: ./docker/message-command/Dockerfile
+      context: ..
+      dockerfile: ./docker/message-command/health/Dockerfile
     environment:
       RABBITMQ_HOST: rabbitmq
       MESSAGE_COMMAND_PORT: 3001
     volumes: ["message-command-data:/home/node/app"]
     ports: ["3001:3001"]
+    networks: [backing-services]
+
   message-frontend:
-    image: 127.0.0.1:5000/message-frontend
     restart: unless-stopped
-    depends_on: [message-command]
+    depends_on:
+      message-command:
+        condition: service_healthy
     build:
-      context: ../
-      dockerfile: ./docker/message-frontend/Dockerfile
+      context: ..
+      dockerfile: ./docker/message-frontend/health/Dockerfile
     environment:
       MESSAGE_FRONTEND_PORT: 3000
       MESSAGE_COMMAND_HOST: message-command
     volumes: ["message-frontend-data:/home/node/app"]
     ports: ["3000:3000"]
+    networks: [backing-services]
+
 volumes:
   mongo-data: {}
   rabbitmq-data: {}
   message-store-data: {}
   message-command-data: {}
   message-frontend-data: {}
+
+networks:
+  backing-services:
+    driver: bridge

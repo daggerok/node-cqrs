@@ -20,13 +20,15 @@ eventual consistency
 done:
 
 . implemented docker infrastructure: rabbitmq, mongo
+. message-frontend app
 . message-command app
+. message-store app
 
 
 .send message via REST API to RabbitMQ message broker
 [sources,bash]
 ----
-http post :3001/api/v1/messages payload='some data as messages.create type event'
+http post :3001/api/v1/messages content='some data as messages.create type event'
 ----
 
 .automation e2e tests using docker swarm / docker stack deploy (required docker / swarm / compose and httpie installed)
@@ -47,14 +49,18 @@ bash e2e-tests/docker-compose.bash
 [sources,bash]
 ----
 yarn -i
-docker-compose -f docker/docker-compose-all.yml up -d --build
+docker-compose -f docker/docker-compose-application-services.yml up -d --build
 http :3001
-docker-compose -f docker/docker-compose-all.yml down -v
+docker-compose -f docker/docker-compose-application-services.yml down -v
 ----
 
-.update npm
+.development
 [sources,bash]
 ----
+yarn -i
+yarn start
+yarn stop
+
 yarn global add npm-check-updates
 ncu -u
 ----
@@ -69,3 +75,50 @@ links:
 . link:https://github.com/mateodelnorte/servicebus-register-handlers[servicebus-register-handlers]
 . link:https://github.com/mateodelnorte/servicebus-trace[servicebus-trace]
 . link:http://nycnode.com/videos/matt-walters-how-to-cqrs-in-node-eventually-consistent-unidirectional-systems-with-microservices[how to cqrs in node talk]
+
+docker links:
+
+. https://docs.docker.com/get-started
+. https://docs.docker.com/compose/compose-file/
+
+----
+ocker build -t friendlyname .  # Create image using this directory's Dockerfile
+docker run -p 4000:80 friendlyname  # Run "friendlyname" mapping port 4000 to 80
+docker run -d -p 4000:80 friendlyname         # Same thing, but in detached mode
+docker container ls                                # List all running containers
+docker container ls -a             # List all containers, even those not running
+docker container stop <hash>           # Gracefully stop the specified container
+docker container kill <hash>         # Force shutdown of the specified container
+docker container rm <hash>        # Remove specified container from this machine
+docker container rm $(docker container ls -a -q)         # Remove all containers
+docker image ls -a                             # List all images on this machine
+docker image rm <image id>            # Remove specified image from this machine
+docker image rm $(docker image ls -a -q)   # Remove all images from this machine
+docker login             # Log in this CLI session using your Docker credentials
+docker tag <image> username/repository:tag  # Tag <image> for upload to registry
+docker push username/repository:tag            # Upload tagged image to registry
+docker run username/repository:tag                   # Run image from a registry
+
+docker stack ls                                            # List stacks or apps
+docker stack deploy -c <composefile> <appname>  # Run the specified Compose file
+docker service ls                 # List running services associated with an app
+docker service ps <service>                  # List tasks associated with an app
+docker inspect <task or container>                   # Inspect task or container
+docker container ls -q                                      # List container IDs
+docker stack rm <appname>                             # Tear down an application
+
+docker-machine create --driver virtualbox myvm1 # Create a VM (Mac, Win7, Linux)
+docker-machine create -d hyperv --hyperv-virtual-switch "myswitch" myvm1 # Win10
+docker-machine env myvm1                # View basic information about your node
+docker-machine ssh myvm1 "docker node ls"         # List the nodes in your swarm
+docker-machine ssh myvm1 "docker node inspect <node ID>"        # Inspect a node
+docker-machine ssh myvm1 "docker swarm join-token -q worker"   # View join token
+docker-machine ssh myvm1   # Open an SSH session with the VM; type "exit" to end
+docker-machine ssh myvm2 "docker swarm leave"  # Make the worker leave the swarm
+docker-machine ssh myvm1 "docker swarm leave -f" # Make master leave, kill swarm
+docker-machine start myvm1            # Start a VM that is currently not running
+docker-machine stop $(docker-machine ls -q)               # Stop all running VMs
+docker-machine rm $(docker-machine ls -q) # Delete all VMs and their disk images
+docker-machine scp docker-compose.yml myvm1:~     # Copy file to node's home dir
+docker-machine ssh myvm1 "docker stack deploy -c <file> <app>"   # Deploy an app
+----
