@@ -75,6 +75,7 @@ links:
 . link:https://github.com/mateodelnorte/servicebus-register-handlers[servicebus-register-handlers]
 . link:https://github.com/mateodelnorte/servicebus-trace[servicebus-trace]
 . link:http://nycnode.com/videos/matt-walters-how-to-cqrs-in-node-eventually-consistent-unidirectional-systems-with-microservices[how to cqrs in node talk]
+. link:https://www.youtube.com/watch?v=X_VHWQa1k0k[Eventually Consistent Distributed Systems with Node.js for Finance]
 
 docker links:
 
